@@ -2,11 +2,12 @@ require 'set'
 require 'pry'
 
 class Node
-  attr_accessor :value, :adjacency_list, :visited
+  attr_accessor :value, :adjacency_list, :visited, :distance, :path
   def initialize(value)
     @value = value
     @adjacency_list = Set.new
-    @visited = false
+    @distance = 0
+    @path = []
   end
 end
 
@@ -69,18 +70,29 @@ class Knight
 
   def knight_moves(start, dest)
     # remove ele from front: shift
-    board[start].visited = true
-    steps = [start]
+    visited = [start]
     queue = piece_move_one_step_from start
     until queue.empty?
       processed_node = queue.shift
-      steps << processed_node.value unless processed_node.visited
-      processed_node.visited = true
-      break if processed_node.value == dest
-
-      queue += piece_move_one_step_from processed_node.value
+      visited << processed_node.value unless visited.include? processed_node.value
+      possible_steps = piece_move_one_step_from processed_node.value
+      possible_steps.select! do |node|
+        !visited.include?(node.value) && !queue.include?(node)
+      end
+      possible_steps.each do |node|
+        node.path << processed_node.value
+        node.distance = processed_node.distance + 1
+      end
+      queue += possible_steps
     end
-    steps
+    backtrack = [dest]
+    step = board[dest].path[0]
+    until step.nil?
+      backtrack << step
+      step = board[step].path[0]
+    end
+    backtrack << start
+    backtrack.reverse
   end
 end
 
@@ -97,5 +109,5 @@ end
 # end
 k = Knight.new
 # p k.piece_move_one_step_from([0, 0])
-s = k.knight_moves([0, 0], [7, 7])
-s.each { |s| p s; puts }
+s = k.knight_moves([4, 1], [4, 2])
+p s
