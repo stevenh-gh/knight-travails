@@ -68,7 +68,7 @@ class Knight
     destinations
   end
 
-  def knight_moves(start, dest)
+  def traverse(start, dest)
     # remove ele from front: shift
     visited = [start]
     queue = piece_move_one_step_from start
@@ -94,20 +94,22 @@ class Knight
     backtrack << start
     backtrack.reverse
   end
+
+  def knight_moves(start, dest)
+    path = traverse start, dest
+    dist = board[dest].distance + 1
+    puts "You made it in #{dist} moves! Here's your path:"
+    path.each { |coord| print coord; puts }
+  end
 end
 
-b = Board.new
-(0..7).each do |x|
-  (0..7).each do |y|
-    print b.board[[x, y]].value
-  end
-  puts
-end
-# b.board.each_value do |ele|
-#   print "node: #{ele.value}, list: #{ele.adjacency_list}"
+# print coordinates
+# b = Board.new
+# (0..7).each do |x|
+#   (0..7).each do |y|
+#     print b.board[[x, y]].value
+#   end
 #   puts
 # end
 k = Knight.new
-# p k.piece_move_one_step_from([0, 0])
-s = k.knight_moves([4, 1], [4, 2])
-p s
+s = k.knight_moves([7, 7], [7, 6])
